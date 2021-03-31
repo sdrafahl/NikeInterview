@@ -27,11 +27,13 @@ class ShortenedURLServiceSpec extends AnyFunSpec {
       assert(parsedUrl.isSuccess)
      
       val short = parsedUrl.get
-      println(short)
       val originalURL = getFullURL(short)
-      println(originalURL)
-      println(testURL.toExternalForm())
       assert(originalURL.equals(testURL.toExternalForm()))
+    }
+    it("Should return the correct message when asking for a short url that does not exist"){
+      val expectedStatusCode = 400
+      val statusCode = getFullURLWithoutBody(new URL("https://www.facebook.com")).status.code
+      assert(statusCode == expectedStatusCode)
     }
   }
 
@@ -67,5 +69,16 @@ class ShortenedURLServiceSpec extends AnyFunSpec {
       .toList
       .unsafeRunSync()
       .head
+  }
+
+  private def getFullURLWithoutBody(url: URL) = {
+    val uri = Uri.fromString("/Get-Full-URL").toOption.get
+    val requestBody = FullURLRequest(url)
+    val request = Request[IO](Method.GET, uri).withEntity(requestBody.asJson.toString())
+
+    InterviewnikeRoutes
+      .urlShortentingRoutes[IO]
+      .orNotFound(request)
+      .unsafeRunSync()
   }
 }
