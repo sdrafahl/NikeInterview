@@ -42,7 +42,7 @@ object InterviewnikeRoutes {
   }
 
   private def parseRequest[F[_]: Sync, A](request: Request[F], cb: A => F[String])(implicit d: Decoder[A]) = {
-    reques
+    request
       .body
       .through(text.utf8Decode)
       .through(stringStreamParser)      
