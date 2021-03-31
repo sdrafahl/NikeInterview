@@ -14,7 +14,7 @@ object CreateShortendURLService {
   implicit def createIOCreateShortendURLService(implicit shortendRepo: ShortendURLRepository[IO], getBaseURL: GetBaseURL[IO]) = new CreateShortendURLService[IO] {
     def createShortedURL(long: URL): IO[URL] = for {
       baseURL <- getBaseURL.get
-      maybeShort <- shortendRepo.getLong(long)
+      maybeShort <- shortendRepo.getShort(long)
       shortUrl <- maybeShort match {
         case Some(short) => IO.pure(short)
         case None => {
